@@ -1,0 +1,99 @@
+[debug] [2025-12-26T16:53:29.564Z] ----------------------------------------------------------------------
+[debug] [2025-12-26T16:53:29.567Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\diksh\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2025-12-26T16:53:29.568Z] CLI Version:   15.1.0
+[debug] [2025-12-26T16:53:29.568Z] Platform:      win32
+[debug] [2025-12-26T16:53:29.568Z] Node Version:  v20.11.1
+[debug] [2025-12-26T16:53:29.568Z] Time:          Fri Dec 26 2025 22:23:29 GMT+0530 (India Standard Time)
+[debug] [2025-12-26T16:53:29.568Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-12-26T16:53:32.100Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-12-26T16:53:32.101Z] > authorizing via signed-in user (dikshamirgal2005@gmail.com)
+[debug] [2025-12-26T16:53:32.101Z] [iam] checking project buildfolio-d4e25 for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2025-12-26T16:53:32.102Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:32.102Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:32.104Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/buildfolio-d4e25:testIamPermissions [none]
+[debug] [2025-12-26T16:53:32.104Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/buildfolio-d4e25:testIamPermissions x-goog-quota-user=projects/buildfolio-d4e25
+[debug] [2025-12-26T16:53:32.104Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/buildfolio-d4e25:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-12-26T16:53:36.698Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/buildfolio-d4e25:testIamPermissions 200
+[debug] [2025-12-26T16:53:36.698Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/buildfolio-d4e25:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2025-12-26T16:53:36.700Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:36.700Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:36.700Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/buildfolio-d4e25 [none]
+[debug] [2025-12-26T16:53:38.273Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/buildfolio-d4e25 200
+[debug] [2025-12-26T16:53:38.273Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/buildfolio-d4e25 {"projectId":"buildfolio-d4e25","projectNumber":"324152886510","displayName":"BuildFolio","name":"projects/buildfolio-d4e25","resources":{"hostingSite":"buildfolio-d4e25"},"state":"ACTIVE","etag":"1_7dfd0789-a62c-4eda-a2dd-1b58179858ae"}
+[info] 
+[info] === Deploying to 'buildfolio-d4e25'...
+[info] 
+[info] i  deploying hosting 
+[debug] [2025-12-26T16:53:38.283Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:38.283Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:38.283Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/versions [none]
+[debug] [2025-12-26T16:53:38.283Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
+[debug] [2025-12-26T16:53:45.450Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/versions 200
+[debug] [2025-12-26T16:53:45.450Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/versions {"name":"projects/324152886510/sites/buildfolio-d4e25/versions/dfe029a8eff07231","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
+[info] i  hosting[buildfolio-d4e25]: beginning deploy... 
+[info] i  hosting[buildfolio-d4e25]: found 1 files in build 
+[debug] [2025-12-26T16:53:45.463Z] [hosting] uploading with 200 concurrency
+[debug] [2025-12-26T16:53:45.466Z] [hosting] hash cache [YnVpbGQ] not populated
+[debug] [2025-12-26T16:53:45.474Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:45.474Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:45.476Z] [hosting] hash cache [YnVpbGQ] stored for 1 files
+[debug] [2025-12-26T16:53:45.476Z] [hosting][hash queue][FINAL] {"max":6,"min":6,"avg":6,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":8}
+[debug] [2025-12-26T16:53:45.476Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/324152886510/sites/buildfolio-d4e25/versions/dfe029a8eff07231:populateFiles [none]
+[debug] [2025-12-26T16:53:45.476Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/324152886510/sites/buildfolio-d4e25/versions/dfe029a8eff07231:populateFiles {"files":{"/index.html":"333d5275ddc97f98c6de352b3d55787404897f27c3028967ccb72fdd9e7749c8"}}
+[debug] [2025-12-26T16:53:46.270Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/324152886510/sites/buildfolio-d4e25/versions/dfe029a8eff07231:populateFiles 200
+[debug] [2025-12-26T16:53:46.270Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/324152886510/sites/buildfolio-d4e25/versions/dfe029a8eff07231:populateFiles {"uploadUrl":"https://upload-firebasehosting.googleapis.com/upload/sites/buildfolio-d4e25/versions/dfe029a8eff07231/files"}
+[debug] [2025-12-26T16:53:46.270Z] [hosting][populate queue][FINAL] {"max":796,"min":796,"avg":796,"active":0,"complete":1,"success":1,"errored":0,"retried":0,"total":1,"elapsed":796}
+[debug] [2025-12-26T16:53:46.270Z] [hosting] uploads queued: 0
+[debug] [2025-12-26T16:53:46.271Z] [hosting][upload queue][FINAL] {"max":0,"min":9999999999,"avg":0,"active":0,"complete":0,"success":0,"errored":0,"retried":0,"total":0,"elapsed":1766768026271}
+[info] +  hosting[buildfolio-d4e25]: file upload complete 
+[debug] [2025-12-26T16:53:46.279Z] [hosting] deploy completed after 826ms
+[debug] [2025-12-26T16:53:46.280Z] [
+  {
+    "config": {
+      "public": "build",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ],
+      "site": "buildfolio-d4e25"
+    },
+    "version": "projects/324152886510/sites/buildfolio-d4e25/versions/dfe029a8eff07231"
+  }
+]
+[info] i  hosting[buildfolio-d4e25]: finalizing version... 
+[debug] [2025-12-26T16:53:46.285Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:46.285Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:46.286Z] >>> [apiv2][query] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/versions/dfe029a8eff07231 updateMask=status%2Cconfig
+[debug] [2025-12-26T16:53:46.287Z] >>> [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/versions/dfe029a8eff07231 {"status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]}}
+[debug] [2025-12-26T16:53:47.067Z] <<< [apiv2][status] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/versions/dfe029a8eff07231 200
+[debug] [2025-12-26T16:53:47.067Z] <<< [apiv2][body] PATCH https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/versions/dfe029a8eff07231 {"name":"projects/324152886510/sites/buildfolio-d4e25/versions/dfe029a8eff07231","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-12-26T16:53:48.711494Z","createUser":{"email":"dikshamirgal2005@gmail.com"},"finalizeTime":"2025-12-26T16:53:50.540316Z","finalizeUser":{"email":"dikshamirgal2005@gmail.com"}}
+[debug] [2025-12-26T16:53:47.067Z] [hosting] finalized version for buildfolio-d4e25:[object Object]
+[info] +  hosting[buildfolio-d4e25]: version finalized 
+[info] i  hosting[buildfolio-d4e25]: releasing new version... 
+[debug] [2025-12-26T16:53:47.068Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:47.068Z] Checked if tokens are valid: true, expires at: 1766771401775
+[debug] [2025-12-26T16:53:47.069Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/channels/live/releases versionName=projects%2F324152886510%2Fsites%2Fbuildfolio-d4e25%2Fversions%2Fdfe029a8eff07231
+[debug] [2025-12-26T16:53:47.069Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/channels/live/releases {}
+[debug] [2025-12-26T16:53:47.826Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/channels/live/releases 200
+[debug] [2025-12-26T16:53:47.826Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/buildfolio-d4e25/channels/live/releases {"name":"projects/324152886510/sites/buildfolio-d4e25/channels/live/releases/1766768030776000","version":{"name":"projects/324152886510/sites/buildfolio-d4e25/versions/dfe029a8eff07231","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-12-26T16:53:48.711494Z","createUser":{"email":"dikshamirgal2005@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocIqafK9R5LhYugCTL0VBp2xgW-FsNfM5lQl5UOmgVEmaece_FE=mo"},"finalizeTime":"2025-12-26T16:53:50.540316Z","finalizeUser":{"email":"dikshamirgal2005@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocIqafK9R5LhYugCTL0VBp2xgW-FsNfM5lQl5UOmgVEmaece_FE=mo"}},"type":"DEPLOY","releaseTime":"2025-12-26T16:53:50.776Z","releaseUser":{"email":"dikshamirgal2005@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocIqafK9R5LhYugCTL0VBp2xgW-FsNfM5lQl5UOmgVEmaece_FE=mo"}}
+[debug] [2025-12-26T16:53:47.826Z] [hosting] release: {"name":"projects/324152886510/sites/buildfolio-d4e25/channels/live/releases/1766768030776000","version":{"name":"projects/324152886510/sites/buildfolio-d4e25/versions/dfe029a8eff07231","status":"FINALIZED","config":{"rewrites":[{"glob":"**","path":"/index.html"}]},"labels":{"deployment-tool":"cli-firebase"},"createTime":"2025-12-26T16:53:48.711494Z","createUser":{"email":"dikshamirgal2005@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocIqafK9R5LhYugCTL0VBp2xgW-FsNfM5lQl5UOmgVEmaece_FE=mo"},"finalizeTime":"2025-12-26T16:53:50.540316Z","finalizeUser":{"email":"dikshamirgal2005@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocIqafK9R5LhYugCTL0VBp2xgW-FsNfM5lQl5UOmgVEmaece_FE=mo"}},"type":"DEPLOY","releaseTime":"2025-12-26T16:53:50.776Z","releaseUser":{"email":"dikshamirgal2005@gmail.com","imageUrl":"https://lh3.googleusercontent.com/a/ACg8ocIqafK9R5LhYugCTL0VBp2xgW-FsNfM5lQl5UOmgVEmaece_FE=mo"}}
+[info] +  hosting[buildfolio-d4e25]: release complete 
+[info] 
+[info] +  Deploy complete! 
+[info] 
+[info] Project Console: https://console.firebase.google.com/project/buildfolio-d4e25/overview
+[info] Hosting URL: https://buildfolio-d4e25.web.app
+[debug] [2025-12-26T16:53:53.176Z] Error: Timed out.
+    at Timeout._onTimeout (C:\Users\diksh\AppData\Roaming\npm\node_modules\firebase-tools\lib\utils.js:275:49)
+    at listOnTimeout (node:internal/timers:573:17)
+    at process.processTimers (node:internal/timers:514:7)
+[error] 
+[error] Error: An unexpected error has occurred.
