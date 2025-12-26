@@ -64,8 +64,9 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATES[0]);
   const [isLoading, setIsLoading] = useState(true);
+  // NEW STATE: Tracks if we are in "Create Mode" to show theme options
+  const [isCreatingNew, setIsCreatingNew] = useState(false);
   
-  // --- USER DATA ---
   const [data, setData] = useState({
     fullName: '', role: '', about: '', 
     email: '', phone: '', linkedin: '', github: '',
@@ -149,12 +150,17 @@ export default function App() {
       {view === 'templates' && (
         <TemplateScreen 
           templates={TEMPLATES} 
-          onSelect={(t) => { setSelectedTemplate(t); setView('editor'); }} 
+          onSelect={(t) => { 
+            setIsCreatingNew(false); // HIDE theme options when selecting from list
+            setSelectedTemplate(t); 
+            setView('editor'); 
+          }} 
           user={currentUser} 
           onLogout={handleLogout} 
           setData={setData}
           setSelectedTemplate={setSelectedTemplate}
           setView={setView}
+          setIsCreatingNew={setIsCreatingNew} // Pass this setter
         />
       )}
 
@@ -168,6 +174,7 @@ export default function App() {
               currentTemplate={selectedTemplate}
               templates={TEMPLATES}
               setSelectedTemplate={setSelectedTemplate}
+              isCreatingNew={isCreatingNew} // Pass the flag to control visibility
             />
           </div>
           <div className="preview-wrapper">
@@ -179,7 +186,7 @@ export default function App() {
   );
 }
 
-// --- UPDATED AUTH SCREEN (SIGNUP / LOGIN) ---
+// --- AUTH SCREEN ---
 function AuthScreen({ type, onSubmit, onSwitch }) {
   const submit = (e) => {
     e.preventDefault();
@@ -198,7 +205,7 @@ function AuthScreen({ type, onSubmit, onSwitch }) {
               <input className="input" name="name" placeholder="Enter your name" required />
               <input className="input" name="email" type="email" placeholder="Enter your Email" required />
               <input className="input" name="college" placeholder='Enter college name' required/>
-              <input className="input" name="number"  placeholder='Enter mobile number' required/>
+              <input className="input" name="number" type='number' placeholder='Enter mobile number' required/>
               <input className="input" name="stream" placeholder='Enter stream' required/>
               <input className="input" name="password" type="password" placeholder='Enter password' required/>
               <input className="input" name="confirmPassword" type="password" placeholder='Enter confirm password' required/>
@@ -218,7 +225,8 @@ function AuthScreen({ type, onSubmit, onSwitch }) {
   );
 }
 
-function TemplateScreen({ templates, onSelect, user, onLogout, setData, setSelectedTemplate, setView }) {
+// --- DASHBOARD ---
+function TemplateScreen({ templates, onSelect, user, onLogout, setData, setSelectedTemplate, setView, setIsCreatingNew }) {
   const initial = user?.email ? user.email[0].toUpperCase() : 'U';
 
   const handleContinue = () => {
@@ -232,25 +240,23 @@ function TemplateScreen({ templates, onSelect, user, onLogout, setData, setSelec
         const found = templates.find(t => t.id === parsedData.savedTemplateId);
         if (found) setSelectedTemplate(found);
       }
+      setIsCreatingNew(false); // HIDE theme options for "Edit"
       setView('editor');
     } else {
       alert("No saved portfolio found. Please create a new one.");
     }
   };
 
-  // --- NEW LOGIC: JUMP STRAIGHT TO EDITOR WITH BLANK TEMPLATE ---
   const handleCreateNew = () => {
     if (window.confirm("Start a fresh portfolio? Any unsaved changes will be lost.")) {
-      // 1. Reset Data
       setData({
         fullName: '', role: '', about: '', 
         email: '', phone: '', linkedin: '', github: '',
         image: null, resume: null,
         skills: '', projects: [], achievements: []
       });
-      // 2. Set Default Blank Template
       setSelectedTemplate(BLANK_TEMPLATE);
-      // 3. Go to Editor
+      setIsCreatingNew(true); // SHOW theme options for "Create"
       setView('editor');
     }
   };
@@ -258,7 +264,7 @@ function TemplateScreen({ templates, onSelect, user, onLogout, setData, setSelec
   return (
     <div className="dashboard-container">
       <nav className="dashboard-nav">
-        <div className="nav-brand">PortfolioBuilder</div>
+        <div className="nav-brand">BuildFolio</div>
         <div className="nav-user">
           <div className="avatar-circle">{initial}</div>
           <button onClick={onLogout} className="btn-logout">Logout</button>
@@ -281,7 +287,7 @@ function TemplateScreen({ templates, onSelect, user, onLogout, setData, setSelec
       </div>
 
       <div style={{textAlign: 'center', marginTop: '2rem', marginBottom: '1rem'}} id="template-grid-section">
-        <h2 style={{color: '#111'}}>Choose your Favourite Template!</h2>
+        <h2 style={{color: '#111'}}>Explore Templates</h2>
         <p style={{color: '#666'}}>Or simply click "Create Portfolio" above to start from scratch.</p>
       </div>
 
@@ -299,8 +305,8 @@ function TemplateScreen({ templates, onSelect, user, onLogout, setData, setSelec
   );
 }
 
-// --- EDITOR FORM (With Theme Selector) ---
-function EditorForm({ data, setData, onBack, currentTemplate, templates, setSelectedTemplate }) {
+// --- EDITOR FORM (Conditional Theme Selector) ---
+function EditorForm({ data, setData, onBack, currentTemplate, templates, setSelectedTemplate, isCreatingNew }) {
   const [customLink, setCustomLink] = useState('');
 
   const handleChange = (e) => setData({ ...data, [e.target.name]: e.target.value });
@@ -432,20 +438,22 @@ function EditorForm({ data, setData, onBack, currentTemplate, templates, setSele
         <input type="file" name="resume" onChange={handleFile} className="input" accept=".pdf,.doc,.docx" />
       </div>
 
-      {/* NEW THEME SELECTOR INSIDE EDITOR */}
-      <div className="form-section">
-        <label className="label">Choose Theme & Background</label>
-        <div className="theme-selector">
-          {templates.map(t => (
-            <div 
-              key={t.id} 
-              className={`theme-option ${t.bgClass} ${currentTemplate.id === t.id ? 'selected' : ''}`}
-              title={t.name}
-              onClick={() => setSelectedTemplate(t)}
-            ></div>
-          ))}
+      {/* CONDITIONAL THEME SELECTOR: Only visible if isCreatingNew is TRUE */}
+      {isCreatingNew && (
+        <div className="form-section">
+          <label className="label">Choose Theme & Background</label>
+          <div className="theme-selector">
+            {templates.map(t => (
+              <div 
+                key={t.id} 
+                className={`theme-option ${t.bgClass} ${currentTemplate.id === t.id ? 'selected' : ''}`}
+                title={t.name}
+                onClick={() => setSelectedTemplate(t)}
+              ></div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="form-section">
         <div style={{display:'flex', justifyContent:'space-between'}}>
@@ -520,7 +528,7 @@ function EditorForm({ data, setData, onBack, currentTemplate, templates, setSele
   );
 }
 
-// ... [PreviewWrapper and Layout components (ModernLayout, MinimalLayout, CreativeLayout) are the same as before] ...
+// ... [Keep PreviewWrapper and Layouts as is] ...
 function PreviewWrapper({ data, template }) {
   const [tab, setTab] = useState('preview');
   const [copyText, setCopyText] = useState('Copy Code');
