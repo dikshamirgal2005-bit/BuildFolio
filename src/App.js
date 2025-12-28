@@ -1,10 +1,13 @@
 /* App.js */
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import ImageUpload from './ImageUpload';
+import ImagePreviewCard from './ImagePreviewCard';
 
 // --- FIREBASE IMPORTS ---
 import { initializeApp } from "firebase/app";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // --- FIREBASE CONFIGURATION ---
 const firebaseConfig = {
@@ -19,6 +22,36 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
+
+// --- FIREBASE STORAGE HELPER ---
+/**
+ * Uploads an image to Firebase Storage and returns its download URL
+ * @param {string} imageUrl - The blob URL of the image
+ * @param {string} folderPath - The path in storage (e.g., 'projects', 'achievements')
+ * @param {string} fileName - Unique file name
+ * @returns {Promise<string>} - Download URL of uploaded image
+ */
+async function uploadImageToStorage(imageUrl, folderPath, fileName) {
+  try {
+    // Fetch the blob from the object URL
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    
+    // Create storage reference
+    const storageRef = ref(storage, `${folderPath}/${fileName}`);
+    
+    // Upload the blob
+    await uploadBytes(storageRef, blob);
+    
+    // Get and return the download URL
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
+}
 
 // --- ICONS ---
 const ICONS = {
@@ -50,12 +83,18 @@ const TEMPLATES = [
   { id: 16, name: 'Neon Nights', style: 'Creative', bgClass: 'bg-dark', color: '#00ffff', textColor: '#e0f2fe' },
   { id: 17, name: 'Cherry Red', style: 'Modern', bgClass: 'bg-rose', color: '#9f1239', textColor: '#881337' },
   { id: 18, name: 'Lemon Fresh', style: 'Minimal', bgClass: 'bg-minimal', color: '#ca8a04', textColor: '#422006' },
-  { id: 19, name: 'Midnight Blue', style: 'Creative', bgClass: 'bg-corporate', color: '#60a5fa', textColor: '#f1f5f9' },
+  { id: 19, name: 'Midnight Blue', style: 'Creative', bgClass: 'bg-corporate', color: '#60a5fa', textColor: '#000000ff' },
   { id: 20, name: 'Slate Simple', style: 'Minimal', bgClass: 'bg-modern', color: '#475569', textColor: '#1e293b' },
   { id: 21, name: 'Candy Pink', style: 'Modern', bgClass: 'bg-gradient-peach', color: '#db2777', textColor: '#831843' },
   { id: 22, name: 'Emerald City', style: 'Creative', bgClass: 'bg-forest', color: '#34d399', textColor: '#064e3b' },
   { id: 23, name: 'Electric Violet', style: 'Modern', bgClass: 'bg-purple', color: '#8b5cf6', textColor: '#4c1d95' },
   { id: 24, name: 'Steel Industrial', style: 'Minimal', bgClass: 'bg-gray', color: '#525252', textColor: '#171717' },
+  // --- AI THEME BACKGROUNDS ---
+  { id: 25, name: '🤖 Dark Tech', style: 'Modern', bgClass: 'bg-dark-tech', color: '#00d9ff', textColor: '#e0f2fe', aiTheme: true },
+  { id: 26, name: '💡 Minimal Light', style: 'Minimal', bgClass: 'bg-minimal-light', color: '#3b82f6', textColor: '#1e293b', aiTheme: true },
+  { id: 27, name: '🌈 Gradient Neon', style: 'Creative', bgClass: 'bg-gradient-neon', color: '#ff00ff', textColor: '#ffffff', aiTheme: true },
+  { id: 28, name: '💎 Glassmorphism', style: 'Modern', bgClass: 'bg-glassmorphism', color: '#6366f1', textColor: '#1f2937', aiTheme: true },
+  { id: 29, name: '🚀 Futuristic AI', style: 'Creative', bgClass: 'bg-futuristic-ai', color: '#00ffaa', textColor: '#e0e7ff', aiTheme: true },
 ];
 
 export default function App() {
@@ -205,7 +244,7 @@ function AuthScreen({ type, onSubmit, onSwitch }) {
               <input className="input" name="name" placeholder="Enter your name" required />
               <input className="input" name="email" type="email" placeholder="Enter your Email" required />
               <input className="input" name="college" placeholder='Enter college name' required/>
-              <input className="input" name="number" type='number' placeholder='Enter mobile number' required/>
+              <input className="input" name="number"  placeholder='Enter mobile number' required/>
               <input className="input" name="stream" placeholder='Enter stream' required/>
               <input className="input" name="password" type="password" placeholder='Enter password' required/>
               <input className="input" name="confirmPassword" type="password" placeholder='Enter confirm password' required/>
@@ -349,8 +388,55 @@ function EditorForm({ data, setData, onBack, currentTemplate, templates, setSele
         return;
       }
 
+      // Show loading indicator
+      alert("Uploading images to cloud storage... Please wait.");
+
+      // Create a deep copy of data to modify
+      const deployData = JSON.parse(JSON.stringify(data));
+
+      // Upload project images to Firebase Storage
+      for (let i = 0; i < deployData.projects.length; i++) {
+        const project = deployData.projects[i];
+        if (project.image && project.image.startsWith('blob:')) {
+          try {
+            const fileName = `${safeLink}-project-${project.id}-${Date.now()}.jpg`;
+            const downloadURL = await uploadImageToStorage(project.image, 'projects', fileName);
+            deployData.projects[i].image = downloadURL;
+          } catch (error) {
+            console.error(`Error uploading project image:`, error);
+            // Continue with deployment even if one image fails
+          }
+        }
+      }
+
+      // Upload achievement images to Firebase Storage
+      for (let i = 0; i < deployData.achievements.length; i++) {
+        const achievement = deployData.achievements[i];
+        if (achievement.image && achievement.image.startsWith('blob:')) {
+          try {
+            const fileName = `${safeLink}-achievement-${achievement.id}-${Date.now()}.jpg`;
+            const downloadURL = await uploadImageToStorage(achievement.image, 'achievements', fileName);
+            deployData.achievements[i].image = downloadURL;
+          } catch (error) {
+            console.error(`Error uploading achievement image:`, error);
+            // Continue with deployment even if one image fails
+          }
+        }
+      }
+
+      // Upload profile image if it's a blob URL
+      if (deployData.image && deployData.image.startsWith('blob:')) {
+        try {
+          const fileName = `${safeLink}-profile-${Date.now()}.jpg`;
+          const downloadURL = await uploadImageToStorage(deployData.image, 'profiles', fileName);
+          deployData.image = downloadURL;
+        } catch (error) {
+          console.error(`Error uploading profile image:`, error);
+        }
+      }
+
       const payload = {
-        data: data,
+        data: deployData,
         templateId: currentTemplate.id,
         createdAt: new Date().toISOString()
       };
@@ -360,11 +446,11 @@ function EditorForm({ data, setData, onBack, currentTemplate, templates, setSele
       const fullUrl = `${window.location.origin}${window.location.pathname}?p=${safeLink}`;
       await navigator.clipboard.writeText(fullUrl);
       
-      alert(`🎉 Portfolio Deployed!\n\nLink Copied to Clipboard! 📋\n\n${fullUrl}`);
+      alert(`🎉 Portfolio Deployed Successfully!\n\nAll images uploaded to cloud storage!\nLink Copied to Clipboard! 📋\n\n${fullUrl}`);
       
     } catch (error) {
       console.error("Deploy Error:", error);
-      alert("Deployment failed. Check console.");
+      alert("Deployment failed. Check console for details.");
     }
   };
 
@@ -397,18 +483,24 @@ function EditorForm({ data, setData, onBack, currentTemplate, templates, setSele
     }
   };
 
-  const addProject = () => setData({ ...data, projects: [...data.projects, { id: Date.now(), title: '', desc: '', link: '' }] });
+  const addProject = () => setData({ ...data, projects: [...data.projects, { id: Date.now(), title: '', desc: '', link: '', image: null, techStack: '', githubLink: '', youtubeLink: '' }] });
   const removeProject = (id) => setData({ ...data, projects: data.projects.filter(p => p.id !== id) });
   const updateProject = (id, key, val) => setData({ ...data, projects: data.projects.map(p => p.id === id ? { ...p, [key]: val } : p) });
+  const handleProjectImage = (id, imageUrl) => {
+    setData({ ...data, projects: data.projects.map(p => p.id === id ? { ...p, image: imageUrl } : p) });
+  };
+  const removeProjectImage = (id) => {
+    setData({ ...data, projects: data.projects.map(p => p.id === id ? { ...p, image: null } : p) });
+  };
   
-  const addAchievement = () => setData({ ...data, achievements: [...data.achievements, { id: Date.now(), title: '', desc: '', image: null }] });
+  const addAchievement = () => setData({ ...data, achievements: [...data.achievements, { id: Date.now(), title: '', desc: '', image: null, techStack: '', githubLink: '', youtubeLink: '' }] });
   const removeAchievement = (id) => setData({ ...data, achievements: data.achievements.filter(a => a.id !== id) });
   const updateAchievement = (id, key, val) => setData({ ...data, achievements: data.achievements.map(a => a.id === id ? { ...a, [key]: val } : a) });
-  const handleAchFile = (id, e) => {
-    if(e.target.files[0]) {
-      const url = URL.createObjectURL(e.target.files[0]);
-      setData({ ...data, achievements: data.achievements.map(a => a.id === id ? { ...a, image: url } : a) });
-    }
+  const handleAchievementImage = (id, imageUrl) => {
+    setData({ ...data, achievements: data.achievements.map(a => a.id === id ? { ...a, image: imageUrl } : a) });
+  };
+  const removeAchievementImage = (id) => {
+    setData({ ...data, achievements: data.achievements.map(a => a.id === id ? { ...a, image: null } : a) });
   };
 
   return (
@@ -466,15 +558,24 @@ function EditorForm({ data, setData, onBack, currentTemplate, templates, setSele
       <div className="form-section">
         <label className="label">Achievements</label>
         {data.achievements.map((ach, i) => (
-          <div key={ach.id} style={{background:'#f9fafb', padding:'10px', borderRadius:'8px', marginBottom:'10px', border:'1px solid #eee'}}>
+          <div key={ach.id} style={{background:'#f9fafb', padding:'15px', borderRadius:'8px', marginBottom:'15px', border:'1px solid #eee'}}>
             <input value={ach.title} onChange={(e) => updateAchievement(ach.id, 'title', e.target.value)} className="input" placeholder="Achievement Title" />
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
               <label className="label" style={{fontSize:'0.7rem'}}>Description</label>
               <span onClick={() => fillTextAI('achDesc', i)} className="ai-badge">✨ Fill Desc</span>
             </div>
-            <textarea value={ach.desc} onChange={(e) => updateAchievement(ach.id, 'desc', e.target.value)} className="input" rows="2" placeholder="Details..." />
-            <label className="label" style={{fontSize:'0.75rem'}}>Upload Certificate</label>
-            <input type="file" onChange={(e) => handleAchFile(ach.id, e)} className="input" accept="image/*,.pdf" />
+            <textarea value={ach.desc} onChange={(e) => updateAchievement(ach.id, 'desc', e.target.value)} className="input" rows="2" placeholder="Achievement details..." />
+            
+            <ImageUpload 
+              image={ach.image}
+              onImageChange={(url) => handleAchievementImage(ach.id, url)}
+              onImageRemove={() => removeAchievementImage(ach.id)}
+              label="Certificate/Badge Image"
+            />
+            
+            <input className="input" placeholder="Tech Stack (comma-separated, optional)" value={ach.techStack || ''} onChange={(e) => updateAchievement(ach.id, 'techStack', e.target.value)} />
+            <input className="input" placeholder="GitHub Link (optional)" value={ach.githubLink || ''} onChange={(e) => updateAchievement(ach.id, 'githubLink', e.target.value)} />
+            <input className="input" placeholder="YouTube Link (optional)" value={ach.youtubeLink || ''} onChange={(e) => updateAchievement(ach.id, 'youtubeLink', e.target.value)} />
             <button onClick={() => removeAchievement(ach.id)} className="btn-delete">X Remove</button>
           </div>
         ))}
@@ -484,18 +585,29 @@ function EditorForm({ data, setData, onBack, currentTemplate, templates, setSele
       <div className="form-section">
         <label className="label">Projects</label>
         {data.projects.map((p, i) => (
-          <div key={p.id} style={{background:'#f9fafb', padding:'10px', borderRadius:'8px', marginBottom:'10px', border:'1px solid #eee'}}>
-            <input className="input" placeholder="Title" value={p.title} onChange={(e) => updateProject(p.id, 'title', e.target.value)} />
+          <div key={p.id} style={{background:'#f9fafb', padding:'15px', borderRadius:'8px', marginBottom:'15px', border:'1px solid #eee'}}>
+            <input className="input" placeholder="Project Title" value={p.title} onChange={(e) => updateProject(p.id, 'title', e.target.value)} />
             <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
                <span style={{fontSize:'0.7rem', color:'#666'}}>Description</span>
                <span onClick={() => fillTextAI('projDesc', i)} className="ai-badge">✨ Fill Desc</span>
             </div>
-            <textarea className="input" rows="2" value={p.desc} onChange={(e) => updateProject(p.id, 'desc', e.target.value)} />
-            <input className="input" placeholder="Link" value={p.link} onChange={(e) => updateProject(p.id, 'link', e.target.value)} />
+            <textarea className="input" rows="2" value={p.desc} onChange={(e) => updateProject(p.id, 'desc', e.target.value)} placeholder="Project description..." />
+            
+            <ImageUpload 
+              image={p.image}
+              onImageChange={(url) => handleProjectImage(p.id, url)}
+              onImageRemove={() => removeProjectImage(p.id)}
+              label="Project Image"
+            />
+            
+            <input className="input" placeholder="Tech Stack (comma-separated, e.g. React, Node.js)" value={p.techStack || ''} onChange={(e) => updateProject(p.id, 'techStack', e.target.value)} />
+            <input className="input" placeholder="GitHub Link (optional)" value={p.githubLink || ''} onChange={(e) => updateProject(p.id, 'githubLink', e.target.value)} />
+            <input className="input" placeholder="YouTube Link (optional)" value={p.youtubeLink || ''} onChange={(e) => updateProject(p.id, 'youtubeLink', e.target.value)} />
+            <input className="input" placeholder="Other Link" value={p.link} onChange={(e) => updateProject(p.id, 'link', e.target.value)} />
             <button onClick={() => removeProject(p.id)} className="btn-delete">Delete Project</button>
           </div>
         ))}
-        <button onClick={addProject} className="btn-outline">+ Add Empty Project</button>
+        <button onClick={addProject} className="btn-outline">+ Add Project</button>
       </div>
       
       <div className="form-section">
@@ -643,13 +755,19 @@ function ModernLayout({ data, template }) {
         </div>
 
         <h3 style={{borderBottom:`2px solid ${template.color}`, display:'inline-block', marginBottom:'1rem', color: template.textColor}}>Achievements</h3>
-        <div style={{display:'grid', gap:'1rem'}}>
+        <div className="grid-2">
           {data.achievements.map((ach) => (
-             <div key={ach.id} style={{background:'rgba(255,255,255,0.1)', border: '1px solid rgba(0,0,0,0.05)', padding:'1rem', borderRadius:'6px'}}>
-               <h4 style={{margin:0, color:template.color}}>{ach.title}</h4>
-               <p style={{margin:'5px 0 0', fontSize:'0.9rem', color: template.textColor, opacity: 0.8}}>{ach.desc}</p>
-               {ach.image && <a href={ach.image} target="_blank" rel="noreferrer" style={{fontSize:'0.8rem', color: template.color, display:'block', marginTop:'5px'}}>View Certificate</a>}
-             </div>
+            <ImagePreviewCard
+              key={ach.id}
+              image={ach.image}
+              title={ach.title}
+              description={ach.desc}
+              techStack={ach.techStack ? ach.techStack.split(',').map(t => t.trim()) : []}
+              githubLink={ach.githubLink}
+              youtubeLink={ach.youtubeLink}
+              color={template.color}
+              textColor={template.textColor}
+            />
           ))}
         </div>
       </section>
@@ -658,11 +776,17 @@ function ModernLayout({ data, template }) {
         <h3 style={{borderBottom:`2px solid ${template.color}`, display:'inline-block', marginBottom:'2rem', color: template.textColor}}>Projects</h3>
         <div className="grid-2">
           {data.projects.map(p => (
-            <div key={p.id} className="card" style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(0,0,0,0.05)'}}>
-              <h4 style={{color: template.color, fontSize:'1.2rem'}}>{p.title}</h4>
-              <p style={{fontSize:'0.9rem', color: template.textColor, opacity: 0.8, margin:'10px 0'}}>{p.desc}</p>
-              {p.link && <a href={p.link} target="_blank" rel="noreferrer" style={{color:template.color, fontWeight:'bold', fontSize:'0.9rem'}}>View Project →</a>}
-            </div>
+            <ImagePreviewCard
+              key={p.id}
+              image={p.image}
+              title={p.title}
+              description={p.desc}
+              techStack={p.techStack ? p.techStack.split(',').map(t => t.trim()) : []}
+              githubLink={p.githubLink}
+              youtubeLink={p.youtubeLink}
+              color={template.color}
+              textColor={template.textColor}
+            />
           ))}
         </div>
       </section>
@@ -687,24 +811,40 @@ function MinimalLayout({ data, template }) {
       </div>
 
       <div style={{marginTop:'4rem'}} className="anim-slide">
-        {data.projects.map(p => (
-          <div key={p.id} className="project-item">
-            <h3 style={{marginBottom:'0.5rem', color: template.textColor}}>{p.title}</h3>
-            <p style={{color: template.textColor, opacity: 0.8, fontSize:'0.95rem'}}>{p.desc}</p>
-            {p.link && <a href={p.link} target="_blank" rel="noreferrer" style={{fontSize:'0.8rem', color: template.color, textDecoration:'none'}}>LINK ↗</a>}
-          </div>
-        ))}
+        <div className="grid-2">
+          {data.projects.map(p => (
+            <ImagePreviewCard
+              key={p.id}
+              image={p.image}
+              title={p.title}
+              description={p.desc}
+              techStack={p.techStack ? p.techStack.split(',').map(t => t.trim()) : []}
+              githubLink={p.githubLink}
+              youtubeLink={p.youtubeLink}
+              color={template.color}
+              textColor={template.textColor}
+            />
+          ))}
+        </div>
       </div>
       
       <div style={{marginTop:'3rem', borderTop:'1px solid #eee', paddingTop:'2rem', textAlign:'left'}}>
         <h4 style={{textAlign:'center', marginBottom:'1.5rem', color: template.textColor}}>Achievements</h4>
-        {data.achievements.map((ach) => (
-           <div key={ach.id} style={{marginBottom:'1rem', textAlign:'center'}}>
-             <strong>{ach.title}</strong>
-             <p style={{fontSize:'0.9rem', color: template.textColor, opacity: 0.8}}>{ach.desc}</p>
-             {ach.image && <a href={ach.image} target="_blank" rel="noreferrer" className="btn-cert">View Certificate</a>}
-           </div>
-        ))}
+        <div className="grid-2">
+          {data.achievements.map((ach) => (
+            <ImagePreviewCard
+              key={ach.id}
+              image={ach.image}
+              title={ach.title}
+              description={ach.desc}
+              techStack={ach.techStack ? ach.techStack.split(',').map(t => t.trim()) : []}
+              githubLink={ach.githubLink}
+              youtubeLink={ach.youtubeLink}
+              color={template.color}
+              textColor={template.textColor}
+            />
+          ))}
+        </div>
       </div>
 
       <footer className="contact-section" style={{borderColor: 'rgba(0,0,0,0.1)'}}>
@@ -753,25 +893,39 @@ function CreativeLayout({ data, template }) {
 
       <section className="anim-slide">
         <h3 style={{color: template.textColor, marginBottom:'2rem'}}>PROJECTS</h3>
-        {data.projects.map(p => (
-          <div key={p.id} className="card-bold" style={{borderColor: 'rgba(255,255,255,0.2)'}}>
-            <h2 style={{color: template.color, marginBottom:'0.5rem'}}>{p.title}</h2>
-            <p style={{color: template.textColor, opacity:0.7, marginBottom:'1rem'}}>{p.desc}</p>
-            {p.link && <a href={p.link} target="_blank" rel="noreferrer" style={{color: template.textColor, textDecoration:'underline'}}>Explore Project</a>}
-          </div>
-        ))}
+        <div className="grid-2">
+          {data.projects.map(p => (
+            <ImagePreviewCard
+              key={p.id}
+              image={p.image}
+              title={p.title}
+              description={p.desc}
+              techStack={p.techStack ? p.techStack.split(',').map(t => t.trim()) : []}
+              githubLink={p.githubLink}
+              youtubeLink={p.youtubeLink}
+              color={template.color}
+              textColor={template.textColor}
+            />
+          ))}
+        </div>
       </section>
 
       {data.achievements.length > 0 && (
         <section className="anim-slide" style={{marginTop:'3rem'}}>
            <h3 style={{color: template.textColor, marginBottom:'1rem'}}>HONORS & AWARDS</h3>
-           <div className="achievements-list">
+           <div className="grid-2">
               {data.achievements.map((ach) => (
-                 <div key={ach.id} className="achievement-box" style={{borderColor: template.color}}>
-                    <strong style={{display:'block', fontSize:'1.1rem', color: template.textColor}}>{ach.title}</strong>
-                    <span style={{fontSize:'0.9rem', color: template.textColor, opacity:0.7}}>{ach.desc}</span>
-                    {ach.image && <a href={ach.image} target="_blank" rel="noreferrer" style={{color: template.textColor, textDecoration:'underline', fontSize:'0.8rem', display:'block', marginTop:'5px'}}>View Certificate</a>}
-                 </div>
+                <ImagePreviewCard
+                  key={ach.id}
+                  image={ach.image}
+                  title={ach.title}
+                  description={ach.desc}
+                  techStack={ach.techStack ? ach.techStack.split(',').map(t => t.trim()) : []}
+                  githubLink={ach.githubLink}
+                  youtubeLink={ach.youtubeLink}
+                  color={template.color}
+                  textColor={template.textColor}
+                />
               ))}
            </div>
         </section>

@@ -1,0 +1,188 @@
+/* ImagePreviewCard.css */
+
+.project-image-card {
+  background: #1f2937;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  border: 1px solid #374151;
+  margin-bottom: 1.5rem;
+}
+
+.project-image-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3);
+}
+
+.project-card-image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 45%; /* Smaller aspect ratio for compact cards */
+  background: #111827;
+  overflow: hidden;
+}
+
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.project-card-image-wrapper:hover .image-overlay {
+  opacity: 1;
+}
+
+.image-zoom-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+}
+
+.project-card-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.project-image-card:hover .project-card-image {
+  transform: scale(1.05);
+}
+
+.project-card-content {
+  padding: 1rem;
+  background: #1f2937;
+}
+
+.project-card-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.project-card-description {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0 0 0.75rem 0;
+  opacity: 0.9;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.project-card-tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.tech-badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.tech-badge:hover {
+  transform: scale(1.05);
+}
+
+.project-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border: 1.5px solid;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  background: transparent;
+}
+
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.action-icon {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .project-card-content {
+    padding: 0.85rem;
+  }
+
+  .project-card-title {
+    font-size: 1rem;
+  }
+
+  .project-card-description {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 2;
+  }
+
+  .action-btn {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .tech-badge {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.65rem;
+  }
+  
+  .project-card-image-wrapper {
+    padding-top: 50%;
+  }
+}
+
+@media (max-width: 480px) {
+  .project-card-actions {
+    gap: 0.4rem;
+  }
+
+  .action-btn {
+    padding: 0.4rem 0.65rem;
+    font-size: 0.7rem;
+    gap: 0.3rem;
+  }
+  
+  .action-icon {
+    width: 0.8rem;
+    height: 0.8rem;
+  }
+  
+  .project-card-image-wrapper {
+    padding-top: 55%;
+  }
+}
